@@ -4,12 +4,12 @@ import Landing from "@/Components/Landing";
 const Home = () => {
   return (
     <>
-      <div className="container-fluid bg-warning">
+      <div className="container bg-warning">
         <div className="text-center">
           <img
             src="images/pokemon.svg"
             alt="image"
-            style={{ width: "35rem" }}
+            style={{ width: "30rem" }}
           />
         </div>
         <Landing />

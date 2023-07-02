@@ -1,16 +1,14 @@
 "use client";
-
 import { useEffect, useState } from "react";
-import { pokemon } from "../services/services";
 import axios from "axios";
 import Card from "./Card";
 import { pokemonType } from "@/types/types";
-import Link from "next/link";
-import Detail from "../app/Detail/[id]/Detail";
 
 const Landing = () => {
   const [pokeData, setPokeData] = useState<pokemonType[]>([]);
   const [url, setUrl] = useState("https://pokeapi.co/api/v2/pokemon");
+  const [filterData, setFilterData] = useState<pokemonType[]>([]);
+  const [search, setSearch] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [nextUrl, setNextUrl] = useState<string | null | undefined>();
   const [prevUrl, setPrevUrl] = useState<string | null | undefined>();
@@ -44,7 +42,22 @@ const Landing = () => {
     fetchData();
   }, [url]);
 
-  console.log(pokeData);
+  useEffect(() => {
+    const res: pokemonType[] = filterSearch(pokeData);
+    setFilterData(res);
+  }, [search, pokeData]);
+
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(event.target.value);
+  };
+
+  const filterSearch = (val: pokemonType[]) => {
+    return val.filter((res) => {
+      if (res.name.includes(search)) {
+        return res;
+      }
+    });
+  };
 
   const renderPokemon = (val: pokemonType) => (
     <Card pokemonId={val.id} image={val.image} name={val.name} />
@@ -52,8 +65,23 @@ const Landing = () => {
 
   return (
     <>
-      <div className=" container-fluid row mx-2 my-2">
-        {pokeData.map(renderPokemon)}
+      <div className="container d-flex justify-content-center mt-4">
+        <div className="form-floating  mb-3">
+          <input
+            type="text"
+            className="form-control"
+            id="floatingInput"
+            placeholder="Enter Pokemon name to search"
+            style={{ width: "35rem" }}
+            onChange={handleSearch}
+          />
+          <label>Enter Pokemon Name to Search</label>
+        </div>
+      </div>
+      <div className=" container row mx-2 my-2">
+        {filterData.length == 0
+          ? pokeData.map(renderPokemon)
+          : filterData.map(renderPokemon)}
       </div>
       <div className="d-flex text-center justify-content-center">
         {prevUrl ? (
@@ -63,7 +91,7 @@ const Landing = () => {
               setUrl(prevUrl);
             }}
           >
-            <h2>Prev</h2>
+            <h2>{`<< Prev`}</h2>
           </a>
         ) : (
           " "
@@ -75,7 +103,7 @@ const Landing = () => {
               setUrl(nextUrl);
             }}
           >
-            <h2>Next</h2>
+            <h2>{`Next >>`} </h2>
           </a>
         ) : (
           " "
